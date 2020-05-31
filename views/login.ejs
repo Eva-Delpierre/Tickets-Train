@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/style.css">
-    <title>Ticketac</title>
+    <title>Ticket Train</title>
 </head>
 <body>
                             
@@ -15,7 +15,7 @@
         <!-- Alert message -->
         <% if(alertMessage.length > 0){ %>
             <div style="text-align: center; padding-top: 20px;">
-                <h3 style="color:red;">No account found,<br>You need to Sign-up first </h3>
+                <h3 style="color:red;">Pas de compte trouvé,<br> vous devez vous enregistrer </h3>
             </div>
         <% } %>
 
@@ -26,17 +26,17 @@
             <form style="text-align: center;margin: 50px;" action="/sign-in" method="POST"> 
 
                 <!-- Login title -->
-                <h3 class="logIn">Sign-in : </h3>
+                <h3 class="logIn">Connection : </h3>
 
                 <div class="form-group inputResume">
-                    <input name="signInName" type="text" class="form-control" id="inputPassword" placeholder="Name">
+                    <input name="signInName" type="text" class="form-control" id="inputPassword" placeholder="Nom">
                 </div>
 
                 <div class="form-group inputResume">
                     <input name="signInEmail" type="email" class="form-control" id="inputPassword" placeholder="Email">
                 </div>
 
-                <button type="submit" class="btn btn-danger">Confirm</button>
+                <button type="submit" class="btn btn-danger">Valider</button>
 
             </form>
 
@@ -44,10 +44,10 @@
             <form style="text-align: center;" action="/sign-up" method="POST">
 
                     <!-- Login title -->
-                <h3 class="logIn">Sign-up : </h3>
+                <h3 class="logIn">Créer un compte : </h3>
         
                 <div class="form-group inputResume">
-                    <input name="signUpName" type="text" class="form-control " id="inputPassword" placeholder="Name">  
+                    <input name="signUpName" type="text" class="form-control " id="inputPassword" placeholder="Nom">  
                 </div>
    
         
@@ -55,7 +55,7 @@
                     <input name="signUpEmail" type="text" class="form-control" id="inputPassword" placeholder="Email">
                 </div>
 
-                <button type="submit" class="btn btn-danger">Confirm</button>
+                <button type="submit" class="btn btn-danger">Valider</button>
         
             </form>
 

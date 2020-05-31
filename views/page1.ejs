@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/style.css">
-    <title>Ticketac</title>
+    <title>Ticket Train</title>
 </head>
 <body>
 
@@ -16,16 +16,16 @@
         <a class="navbar-brand" href="/index">
             <img src="/images/train.png" width="30" height="30" alt="">
         </a>        
-        <a class="navbar-brand" href="/index">Ticketac</a>
+        <a class="navbar-brand" href="/index">Ticket Train</a>
 
         <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav mr-auto">
             </ul>
             <span class="navbar-text">
-                <a class="nav-link" href="/" style='color:#c82333; font-weight: bold;;'> Log out</a>
+                <a class="nav-link" href="/" style='color:#c82333; font-weight: bold;;'> Déconnexion</a>
             </span>
             <span class="navbar-text">
-                    <a class="nav-link" href="/myLastTrips">My last trips</a>
+                    <a class="nav-link" href="/myLastTrips">Mes voyages</a>
             </span>
         </div>
 
@@ -35,7 +35,7 @@
     <div class="home">
 
         <!-- Test title -->
-        <h3 class="homeTitle">Tickets available : </h3>
+        <h3 class="homeTitle">Voyages disponibles : </h3>
 
         <!-- Input Field -->
 
@@ -51,7 +51,7 @@
                 <div class="card-body resultCard">
                     <!-- <div>Paris / Lille</div> -->
                     <div> <%= journeyTab[i].departure %> / <%= journeyTab[i].arrival %></div>
-                    <div><small class="text-muted">train departure at : <%= journeyTab[i].departureTime %> pm</small></div>
+                    <div><small class="text-muted">Départ à : <%= journeyTab[i].departureTime %> h</small></div>
                     <div style="display: flex;justify-content: center;align-items: center;">
                      <div style="font-size: 20px;"><%= journeyTab[i].price %> €</div>
                      
@@ -78,7 +78,7 @@
         <% }else{ %>
 
         <div class="noTrainMessage">
-            <h3 style="color:white;margin-bottom: 15px;">Oops ! No trains available... </h3>
+            <h3 style="color:white;margin-bottom: 15px;">Oops ! Pas de train disponible... </h3>
             <a href="/index" class="btn btn-danger mx-sm-3">Home</a>
         </div>
 

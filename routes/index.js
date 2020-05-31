@@ -1,0 +1,319 @@
+var express = require('express');
+var router = express.Router();
+
+var journeyModel = require('../models/journey');
+var userModel = require('../models/user')
+
+// Data -----------------------------------------------------------------------------
+var city = ["Paris","Marseille","Nantes","Lyon","Rennes","Melun","Bordeaux","Lille"]
+var date = ["2019-11-20","2019-11-21","2019-11-22","2019-11-23","2019-11-24"]
+
+//  Ici viennent vos ville sde pouvoir 
+// Data -------------------------------------------
+var dateFormat = require('../views/fonction')
+
+/* GET Login page. */
+router.get('/', function(req, res, next) {
+
+  if(req.session.user == undefined) {
+    req.session.user = [];
+  }
+
+  res.render('login', {alertMessage:''});
+});
+
+/* GET Homepage page. */
+router.get('/index', function(req, res, next) {
+
+  if(req.session.user == undefined) {
+    req.session.user = [];
+  }
+
+  res.render('index', {user:req.session.user });
+});
+
+/* GET Homepage page. */
+router.get('/confirmReservation', function(req, res, next) {
+
+
+  // console.log('/confirmReservation : We have this user in session --> :', req.session.user)
+ 
+  // We want to update our onGoingTicket for our user
+  userModel.findById( 
+    req.session.user._id, 
+
+     async function (err, user) {
+
+        if(err){
+
+          console.log('We have an error in our myTicket route -->', err)
+          res.render('myTickets', {dateFormat, myTickets:req.session.myTickets});
+
+        }else{
+
+          console.log(' /confirmReservation : we found the user --->',user);
+
+          for(i = 0; i<req.session.myTickets.length; i++){
+
+            user.historyTickets.push({
+
+              departure: req.session.myTickets[i].ticketDeparture,
+              arrival: req.session.myTickets[i].ticketArrival,
+              date: req.session.myTickets[i].ticketDate,
+              departureTime: req.session.myTickets[i].ticketDepartureTime,
+              price: req.session.myTickets[i].ticketPrice,
+
+            })
+          }
+
+          await user.save()
+
+          req.session.myTickets = []
+
+          res.render('index', {dateFormat,user:req.session.user });
+        }
+    }
+  )
+
+  // res.render('index', { user:req.session.user });
+});
+
+/* GET Last trips page. */
+router.get('/myLastTrips', function(req, res, next) {
+
+  var historicTravel = [];
+
+  userModel.findById( 
+    req.session.user._id, 
+
+    function (err, user) {
+        if(err){
+          console.log("Error in myLastTrips route  -->",err);
+          res.render('myLastTrips', { title: 'Express',historicTravel });
+        }else{
+          console.log("On a bien le user suivant dans myLastTrips -->",user.historyTickets);
+          res.render('myLastTrips', { title: 'Express',historicTravel:user.historyTickets, dateFormat });
+        }
+        
+    }
+  )
+
+  
+});
+
+/* Post Sign-in */
+router.post('/sign-in', async function(req, res, next) {
+
+  // console.log(' /sign-In : result from the front -->',req.body)
+
+  var isUserExiste = await userModel.find( 
+    { email: req.body.signInEmail } ,
+
+    async function (err, user) {
+
+        if(user.length > 0){
+
+          console.log(' /sign IN : We do have a user with this email')
+
+          // Session
+          req.session.user = user[0]
+
+          // We can render the next page 
+          res.render('index', {user:req.session.user });
+
+        }else{
+
+          console.log(' /Sign IN : We dont have a user with this email, so he needs to sign-up first')
+
+          // We can render the next page 
+          res.render('login', {alertMessage:'You need to sign-up first' });
+          
+        }
+    }
+  )
+});
+
+/* Post Sign-in */
+router.post('/sign-up',async function(req, res, next) {
+
+  // console.log(' /Sign-Up : result from the front -->',req.body)
+
+  var isUserExiste = await userModel.find( 
+    { email: req.body.signUpEmail } ,
+
+    async function (err, user) {
+
+        if(user.length > 0){
+
+          console.log('We already have a user with this email')
+
+          // Session
+          req.session.user = user
+
+          // We can render the next page 
+          res.render('index', { title: 'Express',user:req.session.user });
+
+        }else{
+
+          console.log(' /Sign-UP : We dont have a user with this email, so we need to save it')
+
+          var newUser = await new userModel ({
+            name: req.body.signUpName, 
+            email: req.body.signUpEmail, 
+          });
+   
+          await newUser.save()
+
+          console.log(' /Sign-UP : Our new user -->',newUser)
+
+          // Session
+          req.session.user = newUser
+
+          // We can render the next page 
+          res.render('index', {user: req.session.user});
+          
+        }
+    }
+  )
+
+
+
+  
+});
+
+/* Post journeys */
+router.post('/journeys', function(req, res, next) {
+
+  console.log(' /journeys : result from the front --> : ',req.body)
+
+  var departureCity = req.body.departureCity;
+  var arrivalCity = req.body.arrivalCity; 
+  var dateDeparture = req.body.journeyDate;
+
+  var userId = req.body.userId
+
+  journeyModel.find( 
+    { departure: departureCity,
+      arrival:arrivalCity,
+      date:dateDeparture
+    }, //filter
+
+    function (err, journey) {
+
+        req.session.journeyTab = []
+
+        if(err){
+
+          console.log('/journeys : Oups error -->',err)
+
+        }else{
+
+            if(journey[0] == undefined){
+              
+              console.log('/journeys : Oops, there is no tickets -->')
+              res.render('page1', {journeyTab:req.session.journeyTab, userId, dateFormat });
+
+            }else{
+
+              // console.log(`Trajets au départ de ${journey[0].departure} : `, journey);
+
+              for(var i = 0; i<journey.length; i++){
+      
+                req.session.journeyTab.push(journey[i])
+
+              }
+
+              console.log(' /journeys : my journeyTab de mon back que je vais renvoyer au front -->', req.session.journeyTab)
+
+              res.render('page1', {journeyTab:req.session.journeyTab, userId, dateFormat});
+            }
+          
+        }
+    }
+  )
+
+  
+});
+
+/* Post journeys */
+router.post('/myTicket', async function(req, res, next) {
+
+  console.log('My ticket Choice --> : ', req.body)
+
+  if(req.session.myTickets == undefined){
+    req.session.myTickets = []
+  }
+
+  // We push in our myTicketsSession to create the basket
+  req.session.myTickets.push(req.body)
+
+  // We need to format into Number the price to be able to have a total basket
+  for(var i = 0; i<req.session.myTickets.length; i++){
+    req.session.myTickets[i].ticketPrice =  Number(req.session.myTickets[i].ticketPrice)
+  }
+
+  // console.log('My basket ---->', req.session.myTickets)
+
+  res.render('myTickets', {dateFormat, myTickets:req.session.myTickets});
+  
+});
+
+
+
+
+
+// --------------------------JUST ONCE-------------------------------------
+
+// Remplissage de la base de donnée, une fois suffit
+router.get('/save', async function(req, res, next) {
+
+  // How many journeys we want
+  var count = 300
+
+  // Save  ---------------------------------------------------
+    for(var i = 0; i< count; i++){
+
+    departureCity = city[Math.floor(Math.random() * Math.floor(city.length))]
+    arrivalCity = city[Math.floor(Math.random() * Math.floor(city.length))]
+
+    if(departureCity != arrivalCity){
+
+      var newUser = new journeyModel ({
+        departure: departureCity , 
+        arrival: arrivalCity, 
+        date: date[Math.floor(Math.random() * Math.floor(date.length))],
+        departureTime:Math.floor(Math.random() * Math.floor(23)) + ":00",
+        price: Math.floor(Math.random() * Math.floor(125)) + 25,
+      });
+       await newUser.save();
+    }
+
+  }
+  res.render('index', { title: 'Express' });
+});
+
+// Cette route est juste une verification du Save.
+// Vous pouvez choisir de la garder ou la supprimer.
+router.get('/result', function(req, res, next) {
+
+  // Permet de savoir combien de trajets il y a par ville en base
+  for(i=0; i<city.length; i++){
+
+    journeyModel.find( 
+      { departure: city[i] } , //filtre
+  
+      function (err, journey) {
+
+          console.log(`Nombre de trajets au départ de ${journey[0].departure} : `, journey.length);
+      }
+    )
+
+  }
+
+
+  res.render('index', { title: 'Express' });
+});
+
+
+
+module.exports = router;

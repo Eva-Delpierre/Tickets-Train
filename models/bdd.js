@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv')
 
 // useNewUrlParser ;)
 var options = {
@@ -9,9 +10,9 @@ var options = {
 
 
 // --------------------- BDD -----------------------------------------------------
-mongoose.connect(`mongodb+srv://Eva:TicketTrain@ticket-r9xnt.mongodb.net/ticket?retryWrites=true&w=majority`,
+mongoose.connect('mongodb+srv://Eva:TicketTrain@ticket-r9xnt.mongodb.net/ticket?retryWrites=true&w=majority',
    options,
-   function(err) {
+   function(err) {  
     if (err) {
       console.log(`error, failed to connect to the database because --> ${err}`);
     } else {
